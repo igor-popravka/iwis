@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - ./source:/app
+      - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-0}
+        GROUP_ID: ${GROUP_ID:-0}
+    container_name: app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /app
+    volumes:
+      - ./source:/app
+      - ./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+  rabbitmq:
+    image: rabbitmq:3.7.28-management
+    volumes:
+      - ./storage/rabbitmq:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-admin}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
