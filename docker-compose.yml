@@ -41,3 +41,15 @@ services:
       interval: 5s
       timeout: 15s
       retries: 1
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - ./storage/mongodb:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-root}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-catalog}

@@ -35,7 +35,8 @@ RUN chmod +x /usr/local/bin/install-php-extensions  && sync \
     mcrypt \
     msgpack \
     mysqli \
-    pdo_mysql  \
+    pdo_mysql \
+    mongodb \
     amqp \
     yaml \
     @composer \

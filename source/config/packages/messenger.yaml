@@ -6,8 +6,12 @@ framework:
         transports:
             async_product_import:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                serializer: App\Message\Serializer\ProductImportJsonSerializer
                 options:
-                    queue_name: product_import
+                    exchange:
+                        name: product_import_exchange
+                    queues:
+                        product_import_queue: ~
 
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             # async: '%env(MESSENGER_TRANSPORT_DSN)%'
