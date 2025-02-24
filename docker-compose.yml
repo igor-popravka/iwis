@@ -53,3 +53,17 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER:-root}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-root}
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-catalog}
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-web_shop}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-admin}
+      MYSQL_USER: ${MYSQL_USER:-admin}
+    volumes:
+      - ./storage/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
