@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\MySql\Category;
 use App\Entity\MySql\Product;
 use App\Entity\Mongo\Product AS MongoProduct;
+use App\Event\ProductSavedEvent;
 use App\Repository\Mongo\ProductRepository as MongoProductRepository;
 use App\Repository\MySql\CategoryRepository as MySqlCategoryRepository;
 use App\Repository\MySql\ProductRepository as MySqlProductRepository;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AsCommand(
     name: 'app:process-products',
@@ -27,6 +29,7 @@ class ProcessProductsCommand extends Command
         private readonly MySqlCategoryRepository $mysqlCategoryRepository,
         private readonly EntityManagerInterface $em,
         private readonly DocumentManager $dm,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
         parent::__construct();
     }
@@ -70,6 +73,10 @@ class ProcessProductsCommand extends Command
                 $this->dm->flush();
 
                 $this->em->getConnection()->commit();
+
+                $this->dispatcher->dispatch(new ProductSavedEvent(
+                    "Product `{$mysqlProduct->getName()}`#{$mysqlProduct->getId()} saved}"
+                ));
 
             } catch (\Throwable $throwable) {
                 $this->em->getConnection()->rollBack();
